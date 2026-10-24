@@ -10,12 +10,12 @@ const fills = {
 };
 
 // frame is [left, top, width, height]
-export default function Button({ label, variant = 'green', frame, onPress, textSize = 19.3 }) {
+export default function Button({ label, variant = 'green', frame, onPress, disabled, textSize = 19.3 }) {
   const { px } = useStage();
   const isBack = variant === 'back';
 
   return (
-    <Outlined frame={frame} radius={frame[3] / 2} fill={fills[variant]} onPress={onPress || (() => {})}>
+    <Outlined frame={frame} radius={frame[3] / 2} fill={fills[variant]} disabled={disabled} onPress={onPress || (() => {})}>
       <Text
         style={[
           styles.text,

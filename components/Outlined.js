@@ -10,6 +10,7 @@ export default function Outlined({
   shadow = 2,
   fill = colors.white,
   onPress,
+  disabled = false,
   children,
   overlay,
 }) {
@@ -32,12 +33,12 @@ export default function Outlined({
   );
 
   return (
-    <View style={box(left, top, width, height)}>
+    <View style={[box(left, top, width, height), disabled && styles.disabled]}>
       {shadow > 0 && (
         <View style={[styles.shadow, { borderRadius: outerRadius, top: px(shadow) }]} />
       )}
       {onPress ? (
-        <Pressable accessibilityRole="button" onPress={onPress} style={styles.fillBox}>
+        <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={styles.fillBox}>
           {body}
         </Pressable>
       ) : (
@@ -53,6 +54,9 @@ export default function Outlined({
 }
 
 const styles = StyleSheet.create({
+  disabled: {
+    opacity: 0.5,
+  },
   shadow: {
     position: 'absolute',
     left: 0,

@@ -22,7 +22,13 @@ export default function Chip({ label, description, icon, iconSize = 18, selected
         overlay={
           <>
             <Text style={[styles.cardTitle, { fontSize: px(14), top: px(8) }]}>{label}</Text>
-            <Text style={[styles.cardText, { fontSize: px(10), top: px(26), left: px(6), right: px(6) }]}>
+            <Text
+              style={[
+                styles.cardText,
+                { fontSize: px(10), top: px(26), left: px(6), right: px(6) },
+                selected && styles.cardTextSelected,
+              ]}
+            >
               {description}
             </Text>
           </>
@@ -66,6 +72,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: fonts.body,
     color: colors.ink,
+  },
+  cardTextSelected: {
+    color: colors.subtitleGrey,
   },
   cardText: {
     position: 'absolute',

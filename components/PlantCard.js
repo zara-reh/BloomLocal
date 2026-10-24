@@ -3,29 +3,36 @@ import { colors, fonts } from './theme';
 import { useStage } from './Screen';
 import Outlined from './Outlined';
 
-export default function PlantCard({ plant, top = 0 }) {
+export default function PlantCard({ plant, top = 0, selected = false, onPress }) {
   const { px, box } = useStage();
-  const [pictureWidth, pictureHeight] = plant.imageSize;
-
   return (
     <Outlined
       frame={[33, top, 294, 100]}
       radius={11}
       border={1.5}
       shadow={2}
+      onPress={onPress}
       overlay={
         <>
           <Text style={[styles.small, box(14, 10), { fontSize: px(7.9) }]}>{plant.category}</Text>
           <Text style={[styles.small, box(14, 81), { fontSize: px(7) }]}>{plant.scientificName}</Text>
 
           <Outlined frame={[13, 24, 52, 52]} radius={5.8} border={1.2} shadow={1.7} fill={colors.background}>
-            <Image source={plant.image} style={{ width: px(pictureWidth), height: px(pictureHeight) }} />
+            <Image source={plant.image} style={{ width: px(42), height: px(42) }} resizeMode="contain" />
           </Outlined>
 
           <Text style={[styles.name, box(79, 12), { fontSize: px(17) }]}>{plant.name}</Text>
           <Text style={[styles.growTime, box(79, 38), { fontSize: px(9) }]}>{plant.growTime}</Text>
 
-          <Outlined frame={[265, 9, 21, 21]} radius={10.5} border={1} shadow={2} fill={colors.background} />
+          <Outlined
+          frame={[265, 9, 21, 21]}
+          radius={10.5}
+          border={1}
+          shadow={2}
+          fill={selected ? colors.greenMid : colors.background}
+        >
+          {selected && <Text style={[styles.check, { fontSize: px(12) }]}>{'\u2713'}</Text>}
+        </Outlined>
 
           <View style={[box(77, 57, 206, 26), styles.strip, { borderRadius: px(21), borderWidth: Math.max(px(0.8), 1) }]}>
             <View style={[styles.divider, box(63, 4, 1, 16)]} />
@@ -71,6 +78,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     color: colors.black,
     textAlign: 'center',
+  },
+  check: {
+    fontFamily: fonts.bodyBold,
+    color: colors.black,
   },
   stripValue: {
     fontFamily: fonts.body,
