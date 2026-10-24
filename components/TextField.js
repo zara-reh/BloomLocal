@@ -22,5 +22,6 @@ const styles = StyleSheet.create({
     height: '100%',
     fontFamily: fonts.body,
     color: colors.ink,
+    outlineStyle: 'none',
   },
 });

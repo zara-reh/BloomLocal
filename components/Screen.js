@@ -1,9 +1,9 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
 
-// Screens are drawn on a 360 x 640 so it fits phone
+// Screens are drawn on a 360 x 640 stage that is scaled to fit the phone.
 const ScaleContext = createContext(1);
 export const ScaleProvider = ScaleContext.Provider;
 
@@ -22,44 +22,59 @@ export function useStage() {
   return { px, box };
 }
 
-// keyboard: scroll the screen out of the way of the keyboard
-export default function Screen({ children, keyboard = false }) {
-  const { width, height } = useWindowDimensions();
+// keyboard:     scroll the screen out of the way of the keyboard
+// tab:          the screen sits above the tab bar, which already covers the bottom inset
+// scrollHeight: design height of a tall screen; it is scaled by width and scrolls
+export default function Screen({ children, keyboard = false, tab = false, scrollHeight }) {
+  const window = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const scale = Math.min(width / DESIGN_WIDTH, (height - insets.top - insets.bottom) / DESIGN_HEIGHT);
+  const [size, setSize] = useState(null);
+
+  const width = size ? size.width : window.width;
+  const height = size ? size.height : window.height;
+  const paddingTop = insets.top;
+  const paddingBottom = tab ? 0 : insets.bottom;
+
+  const scrolls = scrollHeight !== undefined;
+  const stageHeight = scrolls ? scrollHeight : DESIGN_HEIGHT;
+  const scale = scrolls
+    ? width / DESIGN_WIDTH
+    : Math.min(width / DESIGN_WIDTH, (height - paddingTop - paddingBottom) / DESIGN_HEIGHT);
 
   const stage = (
     <ScaleProvider value={scale}>
-      <View style={{ width: DESIGN_WIDTH * scale, height: DESIGN_HEIGHT * scale }}>{children}</View>
+      <View style={{ width: DESIGN_WIDTH * scale, height: stageHeight * scale }}>{children}</View>
     </ScaleProvider>
   );
 
-  if (keyboard) {
-    return (
+  let content;
+  if (keyboard || scrolls) {
+    content = (
       <ScrollView
-        style={styles.screen}
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: 'center',
-          justifyContent: 'center',
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom,
+          justifyContent: scrolls ? 'flex-start' : 'center',
+          paddingTop,
+          paddingBottom,
         }}
         keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
+        automaticallyAdjustKeyboardInsets={keyboard}
       >
         {stage}
       </ScrollView>
     );
+  } else {
+    content = (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop, paddingBottom }}>
+        {stage}
+      </View>
+    );
   }
+
   return (
-    <View
-      style={[
-        styles.screen,
-        { alignItems: 'center', justifyContent: 'center', paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
-      {stage}
+    <View style={styles.screen} onLayout={(event) => setSize(event.nativeEvent.layout)}>
+      {content}
     </View>
   );
 }

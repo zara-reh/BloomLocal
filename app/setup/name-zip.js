@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { colors, fonts } from '../../components/theme';
@@ -9,7 +9,8 @@ import ProgressHeader from '../../components/ProgressHeader';
 import Bloom from '../../components/Bloom';
 import TextField from '../../components/TextField';
 import { useAppState } from '../../state/AppState';
-import { lookupZone, FALLBACK_ZONE } from '../../data/zone';
+import { useZoneLookup } from '../../state/useZoneLookup';
+import ZoneMessage from '../../components/ZoneMessage';
 
 export default function NameZipScreen() {
   return (
@@ -21,32 +22,15 @@ export default function NameZipScreen() {
 
 function NameZipContent() {
   const { px, box } = useStage();
-  const { name, setName, zip, setZip, zone, setZone } = useAppState();
-  // 'idle', 'loading', 'found', or 'fallback' (the zip could not be looked up)
-  const [lookup, setLookup] = useState('idle');
+  const { name, setName, zip, setZip, setZone, setLocation } = useAppState();
+  const { status, zone, location } = useZoneLookup(zip);
 
   useEffect(() => {
-    if (zip.length !== 5) {
-      setZone(null);
-      setLookup('idle');
-      return;
-    }
+    setZone(zone);
+    setLocation(location);
+  }, [zone, location]);
 
-    let ignore = false;
-    setLookup('loading');
-    lookupZone(zip).then((result) => {
-      if (ignore) {
-        return;
-      }
-      setZone(result.zone);
-      setLookup(result.found ? 'found' : 'fallback');
-    });
-    return () => {
-      ignore = true;
-    };
-  }, [zip]);
-
-  const canContinue = name.trim().length > 0 && (lookup === 'found' || lookup === 'fallback');
+  const canContinue = name.trim().length > 0 && (status === 'found' || status === 'fallback');
 
   return (
     <>
@@ -77,18 +61,7 @@ function NameZipContent() {
         This is so we can give you the best plants for your zone!
       </Text>
 
-      <Text style={[styles.center, styles.message, box(33, 483, 293), { fontSize: px(17) }]}>
-        {zip.length > 0 && zip.length < 5 && 'Please enter all 5 digits of your zip code.'}
-        {lookup === 'loading' && 'Looking up your garden zone...'}
-        {lookup === 'found' && (
-          <>
-            {'We found your garden zone!\n'}
-            <Text style={styles.zone}>Zone {zone}</Text>
-          </>
-        )}
-        {lookup === 'fallback' &&
-          `We could not find that zip code, so we will start you in Zone ${FALLBACK_ZONE}.`}
-      </Text>
+      <ZoneMessage zip={zip} status={status} zone={zone} style={box(33, 483, 293)} />
 
       <Button variant="back" frame={[23, 542, 70.7, 54]} onPress={() => router.back()} />
       <Button
@@ -110,11 +83,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     color: colors.ink,
     textAlign: 'center',
-  },
-  message: {
-    color: colors.zoneText,
-  },
-  zone: {
-    fontFamily: fonts.bodyMedium,
   },
 });

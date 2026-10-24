@@ -19,6 +19,12 @@ export default function ReadyScreen() {
 function ReadyContent() {
   const { px, box } = useStage();
 
+  // Clear the setup screens from the history so there is no way back into setup.
+  const finishSetup = () => {
+    router.dismissAll();
+    router.replace('/home');
+  };
+
   return (
     <>
       <Logo x={117} y={18} />
@@ -36,7 +42,7 @@ function ReadyContent() {
       <Bloom frame={[129.3, 261.2, 102.9, 107.5]} shadow={[125, 355.8, 111, 23]} />
 
       <Button variant="back" frame={[25, 552, 70.7, 54]} onPress={() => router.back()} />
-      <Button label="finish setup" frame={[110, 552, 225.3, 54]} />
+      <Button label="finish setup" frame={[110, 552, 225.3, 54]} onPress={finishSetup} />
     </>
   );
 }

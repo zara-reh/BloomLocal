@@ -37,3 +37,27 @@ export const outline = {
 
 export const DESIGN_WIDTH = 360;
 export const DESIGN_HEIGHT = 640;
+
+// Colors that only the Schedule screen uses.
+export const scheduleColors = {
+  divider: '#F4E7CB',
+  selectedDay: '#F7EDD9',
+  dotGray: '#B0B0B0',
+  dotGreen: '#7EB584',
+  toggleActive: '#2B4B2C',
+  toggleInactive: '#32412C',
+  completedLink: '#85AB85',
+  tipBox: '#F9EBD0',
+  tipBorder: '#888171',
+  tipText: '#5A503A',
+  monthBorder: '#423C3A',
+  monthText: '#3B3935',
+  monthFill: '#FFFEFA',
+  monthNow: '#ADDAB2',
+  badgeBloom: '#CCF4D4',
+  badgeBudding: '#CEEAF3',
+  progress: '#B0DBB3',
+  note: '#84AF87',
+  scientificName: '#909090',
+  stripDivider: '#AAA194',
+};

@@ -27,7 +27,7 @@ export const plants = [
   },
   {
     id: 'lambs-ear',
-    name: "Lamb's ear",
+    name: 'Lamb\u2019s ear',
     scientificName: 'Stachys byzantina',
     category: 'Perennials',
     zones: zones('4a', '9b'),
@@ -79,13 +79,13 @@ export const plants = [
   {
     id: 'peony',
     name: 'Peony',
-    scientificName: 'Paeonia lactiflora',
+    scientificName: 'Paeonia',
     category: 'Perennials',
     zones: zones('3a', '8b'),
     sun: ['Full Sun', 'Part Shade'],
     soils: ['Loam', 'Silt'],
     care: 'Medium',
-    water: 'Heavy',
+    water: 'High',
     shade: 'Partial',
     sunLabel: 'Full Sun',
     pollinator: true,
@@ -102,29 +102,29 @@ export const plants = [
     sun: ['Full Sun'],
     soils: ['Sand', 'Loam'],
     care: 'High',
-    water: 'Heavy',
+    water: 'High',
     shade: 'None',
     sunLabel: 'Full Sun',
     pollinator: false,
     edible: true,
-    growTime: '70 to 100 days to harvest',
+    growTime: '70 to 90 days to harvest',
     image: require('../assets/images/plants/watermelon.png'),
   },
   {
     id: 'maple-tree',
-    name: 'Maple Tree',
-    scientificName: 'Acer grandidentatum',
+    name: 'Maple tree',
+    scientificName: 'Acer',
     category: 'Trees',
     zones: zones('4a', '9b'),
     sun: ['Full Sun', 'Part Shade'],
     soils: ['Sand', 'Loam', 'Silt'],
     care: 'Medium',
-    water: 'Moderate',
+    water: 'Low',
     shade: 'Partial',
-    sunLabel: 'Full Sun',
+    sunLabel: 'Partial Sun',
     pollinator: false,
     edible: false,
-    growTime: 'Slow growing, many years to mature',
+    growTime: '10 to 20 years to reach full maturity',
     image: require('../assets/images/plants/maple-tree.png'),
   },
   {
@@ -196,3 +196,76 @@ export const plants = [
     image: require('../assets/images/plants/primrose.png'),
   },
 ];
+
+export const ecoStats = {
+  oxygen: '14 lbs',
+  carbon: '6 lbs',
+  pollinatorScore: '70 pts',
+};
+
+// What each plant needs next. Plants not listed here were watered recently.
+const careStatuses = {
+  watermelon: { type: 'water', text: 'Water now!', urgent: true },
+  peony: { type: 'prune', text: 'Prune soon', urgent: true },
+};
+
+export function getCareStatus(plantId) {
+  return careStatuses[plantId] || { type: 'water', text: 'Watered 2 days ago.', urgent: false };
+}
+
+// The Schedule screen's tasks are pretend data. Dates come from today's real date.
+
+// dueInDays counts from today. titleAt is where the title starts inside the card,
+// tipCenter is where the tip text is centered.
+export const tasks = [
+  {
+    id: 'water-watermelon',
+    title: 'Water Watermelon',
+    icon: 'drop',
+    iconColor: '#C1E5FF',
+    dueInDays: 0,
+    tip: ['Water at the base early in the', 'morning so the leaves stay dry.'],
+    tipCenter: 200.7,
+    titleAt: [52.8, 15],
+  },
+  {
+    id: 'prune-peony',
+    title: 'Prune Peony',
+    icon: 'scissors',
+    iconColor: '#CBE8C1',
+    dueInDays: 0,
+    tip: ['Tip: cut all the stems down to', 'about 2 to 3 inches above the', 'ground!'],
+    tipCenter: 194.9,
+    titleAt: [52.6, 13.9],
+    tipIcon: true,
+  },
+  {
+    id: 'mulch-beds',
+    title: 'Add Mulch to Beds',
+    icon: 'shovel',
+    iconColor: '#E9D5C0',
+    dueInDays: 3,
+    tip: ['Mulch acts as a protective barrier that', 'conserves moisture and improves long', 'term soil health!'],
+    tipCenter: 191.4,
+    titleAt: [51.4, 15],
+  },
+];
+
+// When each plant buds and then blooms every year, as [[startMonth, startDay], [endMonth, endDay]].
+// name replaces the plant's usual name on the Bloom Tracker.
+export const bloomSeasons = {
+  carrot: { budding: [[5, 1], [5, 31]], blooming: [[6, 1], [7, 31]] },
+  beet: { budding: [[5, 15], [6, 15]], blooming: [[6, 16], [7, 31]] },
+  watermelon: { budding: [[6, 1], [6, 20]], blooming: [[6, 21], [8, 31]] },
+  peas: { budding: [[4, 15], [5, 10]], blooming: [[5, 11], [6, 30]] },
+  hellebore: { budding: [[11, 15], [12, 19]], blooming: [[12, 20], [3, 31]] },
+  primrose: { budding: [[2, 1], [2, 28]], blooming: [[3, 1], [5, 15]] },
+  bluebonnet: { budding: [[2, 15], [3, 14]], blooming: [[3, 15], [5, 15]] },
+  peony: { budding: [[4, 1], [4, 30]], blooming: [[5, 1], [6, 15]] },
+  'lambs-ear': { name: 'Lamb\u2019s Ear', budding: [[5, 1], [5, 31]], blooming: [[6, 1], [8, 15]] },
+  boxwood: { budding: [[3, 1], [3, 31]], blooming: [[4, 1], [4, 30]] },
+  'maple-tree': { budding: [[3, 1], [3, 20]], blooming: [[3, 21], [4, 20]] },
+};
+
+// The order Discover lists plants in. Plants not named here follow in their normal order.
+export const discoverOrder = ['carrot', 'watermelon', 'hellebore', 'maple-tree', 'lambs-ear'];

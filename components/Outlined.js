@@ -1,16 +1,34 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors } from './theme';
 import { useStage } from './Screen';
+import Pop from './Pop';
 
+// Black outline, hard black shadow, and a colored fill. The outline is a solid black
+// shape with the fill inside it, so the fill never leaks out at the rounded edge.
+// frame is [left, top, width, height] in design units.
+//   children: centered inside the fill
+//   overlay:  placed on top of the box, measured from its top left corner
+// With onPress the whole shape pops when it is pressed. popScale is how far it shrinks.
+export default function Outlined({ frame, onPress, disabled = false, popScale, ...shapeProps }) {
+  if (!onPress) {
+    return <Shape frame={frame} {...shapeProps} />;
+  }
 
-export default function Outlined({
+  return (
+    <Pop frame={frame} onPress={onPress} disabled={disabled} scaleTo={popScale}>
+      <Shape frame={[0, 0, frame[2], frame[3]]} {...shapeProps} />
+    </Pop>
+  );
+}
+
+function Shape({
   frame,
   radius,
   border = 3,
   shadow = 2,
   fill = colors.white,
-  onPress,
-  disabled = false,
+  borderColor = colors.black,
+  shadowColor = colors.black,
   children,
   overlay,
 }) {
@@ -19,33 +37,23 @@ export default function Outlined({
   const outerRadius = px(radius);
   const borderWidth = px(border);
 
-  const body = (
-    <View style={[styles.outline, { borderRadius: outerRadius, padding: borderWidth }]}>
-      <View
-        style={[
-          styles.fill,
-          { borderRadius: Math.max(outerRadius - borderWidth, 0), backgroundColor: fill },
-        ]}
-      >
-        {children}
-      </View>
-    </View>
-  );
-
   return (
-    <View style={[box(left, top, width, height), disabled && styles.disabled]}>
+    <View style={box(left, top, width, height)}>
       {shadow > 0 && (
-        <View style={[styles.shadow, { borderRadius: outerRadius, top: px(shadow) }]} />
+        <View style={[styles.shadow, { borderRadius: outerRadius, top: px(shadow), backgroundColor: shadowColor }]} />
       )}
-      {onPress ? (
-        <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={styles.fillBox}>
-          {body}
-        </Pressable>
-      ) : (
-        body
-      )}
+      <View style={[styles.outline, { borderRadius: outerRadius, padding: borderWidth, backgroundColor: borderColor }]}>
+        <View
+          style={[
+            styles.fill,
+            { borderRadius: Math.max(outerRadius - borderWidth, 0), backgroundColor: fill },
+          ]}
+        >
+          {children}
+        </View>
+      </View>
       {overlay && (
-        <View style={StyleSheet.absoluteFill} pointerEvents={onPress ? 'none' : 'box-none'}>
+        <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
           {overlay}
         </View>
       )}
@@ -54,22 +62,14 @@ export default function Outlined({
 }
 
 const styles = StyleSheet.create({
-  disabled: {
-    opacity: 0.5,
-  },
   shadow: {
     position: 'absolute',
     left: 0,
     right: 0,
     height: '100%',
-    backgroundColor: colors.black,
-  },
-  fillBox: {
-    flex: 1,
   },
   outline: {
     flex: 1,
-    backgroundColor: colors.black,
   },
   fill: {
     flex: 1,

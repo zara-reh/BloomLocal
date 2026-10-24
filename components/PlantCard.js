@@ -12,6 +12,7 @@ export default function PlantCard({ plant, top = 0, selected = false, onPress })
       border={1.5}
       shadow={2}
       onPress={onPress}
+      popScale={0.98}
       overlay={
         <>
           <Text style={[styles.small, box(14, 10), { fontSize: px(7.9) }]}>{plant.category}</Text>
