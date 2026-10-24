@@ -4,13 +4,15 @@ import { colors, fonts, DESIGN_WIDTH, DESIGN_HEIGHT } from '../components/theme'
 import { ScaleProvider } from '../components/Screen';
 import Button from '../components/Button';
 
-// Laid out on a 360 x 640 stage, scaled to fit the phone and anchored to the bottom.
+// Laid out on a 360 x 640 stage, scaled to fit the phone and sitting a little above the bottom.
+const LIFT = 18;
 export default function WelcomeScreen() {
   const { width, height } = useWindowDimensions();
   const scale = Math.min(width / DESIGN_WIDTH, height / DESIGN_HEIGHT);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingBottom: LIFT * scale }]}>
+      <View style={[styles.ground, { height: LIFT * scale + 1 }]} />
       <ScaleProvider value={scale}>
         <View style={{ width: DESIGN_WIDTH * scale, height: DESIGN_HEIGHT * scale }}>
           <Image
@@ -31,7 +33,7 @@ export default function WelcomeScreen() {
           <Button
             label="begin"
             variant="cream"
-            frame={[50, 547, 260, 56]}
+            frame={[50, 537, 260, 56]}
             textSize={20}
             onPress={() => router.push('/meet-bloom')}
           />
@@ -47,6 +49,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'flex-end',
+  },
+  ground: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.brown,
   },
   background: {
     position: 'absolute',

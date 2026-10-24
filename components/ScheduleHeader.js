@@ -6,7 +6,6 @@ import Label from './Label';
 import Logo from './Logo';
 import Outlined from './Outlined';
 import Pop from './Pop';
-import { tasks } from '../data/mockData';
 import { daysBetween, monthTitle, seasonName, weekOf } from '../data/calendar';
 
 const DAY_CENTERS = [56.5, 98.6, 138.8, 180.0, 221.0, 262.5, 302.4];
@@ -17,13 +16,13 @@ const DOT_COLORS = {
 
 // Title, month calendar, and the Tasks / Bloom Tracker switch at the top of the Schedule screen.
 // The small dot under a date: green when a task is due that day, gray when nothing is.
-function dotsFor(day, today, doneTaskIds) {
+function dotsFor(day, today, tasks) {
   const offset = daysBetween(today, day);
-  const due = tasks.some((task) => task.dueInDays === offset && !doneTaskIds.includes(task.id));
+  const due = tasks.some((task) => task.dueInDays === offset);
   return [due ? 'green' : 'gray'];
 }
 
-export default function ScheduleHeader({ tab, onTabChange, tasksToday, today, doneTaskIds }) {
+export default function ScheduleHeader({ tab, onTabChange, tasksToday, today, tasks }) {
   const { px, box } = useStage();
   const tasksTab = [35.6, 314.4, 142.6, 23.9];
   const bloomTab = [184.8, 314.4, 142.6, 23.9];
@@ -54,7 +53,7 @@ export default function ScheduleHeader({ tab, onTabChange, tasksToday, today, do
 
       {weekOf(today).map((day, index) => {
         const cx = DAY_CENTERS[index];
-        const dots = dotsFor(day.day, today, doneTaskIds);
+        const dots = dotsFor(day.day, today, tasks);
         return (
           <View key={index}>
             {day.today && (
@@ -96,7 +95,7 @@ export default function ScheduleHeader({ tab, onTabChange, tasksToday, today, do
         <Outlined frame={tasksTab} radius={11.95} border={1.5} shadow={2} fill={colors.green} />
       </Animated.View>
       <Label x={106.9} y={320} size={9.7} align="center" width={130} color={tab === 'tasks' ? scheduleColors.toggleActive : scheduleColors.toggleInactive}>
-        {`Tasks ${tasksToday} Today`}
+        Tasks
       </Label>
       <Label x={260.1} y={320} size={10.7} align="center" width={130} color={tab === 'bloom' ? scheduleColors.toggleActive : scheduleColors.toggleInactive}>
         Bloom Tracker

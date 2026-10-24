@@ -7,8 +7,9 @@ import Outlined from '../../components/Outlined';
 import GardenCard from '../../components/GardenCard';
 import Label from '../../components/Label';
 import { useAppState } from '../../state/AppState';
-import { useWeather } from '../../state/useWeather';
-import { plants, ecoStats, getCareStatus } from '../../data/mockData';
+import { useCare } from '../../state/useCare';
+import { plants } from '../../data/mockData';
+import { ecoEstimate } from '../../data/eco';
 
 const weatherIcons = {
   cloud: require('../../assets/images/home/weather-cloud.png'),
@@ -35,29 +36,24 @@ export default function HomeScreen() {
 
 function HomeContent() {
   const { px, box } = useStage();
-  const { name, zip, zone, gardenIds, location } = useAppState();
-  const { status, weather } = useWeather(location);
+  const { name, zip, zone, gardenIds, weather, weatherStatus } = useAppState();
+  const { tasks } = useCare();
 
   let weatherTitle = 'Loading weather...';
   let weatherDetails = '';
   if (weather) {
     weatherTitle = `${weather.condition} \u2022 ${weather.temperature}`;
     weatherDetails = weather.details;
-  } else if (status === 'error') {
+  } else if (weatherStatus === 'error') {
     weatherTitle = 'Weather unavailable';
     weatherDetails = 'Check your internet connection.';
   }
 
   const garden = gardenIds.map((id) => plants.find((plant) => plant.id === id));
-  const needsWater = garden.filter((plant) => {
-    const status = getCareStatus(plant.id);
-    return status.type === 'water' && status.urgent;
-  }).length;
-  const needsPruning = garden.filter((plant) => {
-    const status = getCareStatus(plant.id);
-    return status.type === 'prune' && status.urgent;
-  }).length;
+  const needsWater = tasks.filter((task) => task.type === 'water' && task.dueInDays === 0).length;
+  const needsPruning = tasks.filter((task) => task.type === 'prune' && task.dueInDays === 0).length;
 
+  const ecoStats = ecoEstimate(garden);
   const ecoCards = [
     { left: 25, circle: require('../../assets/images/home/circle-oxygen.png'), icon: require('../../assets/images/home/eco-oxygen.png'), iconBox: [43, 15, 14, 14], value: ecoStats.oxygen, label: 'O₂ Produced', labelSize: 8 },
     { left: 131, circle: require('../../assets/images/home/circle-carbon.png'), icon: require('../../assets/images/home/eco-carbon.png'), iconBox: [43, 15, 14, 14], value: ecoStats.carbon, label: 'CO₂ Absorbed', labelSize: 8 },
@@ -108,6 +104,7 @@ function HomeContent() {
       />
 
       <Text style={[styles.heading, box(27, 256, 262), { fontSize: px(20) }]}>Eco Impact Dashboard</Text>
+      <Text style={[styles.estimate, box(225, 264, 108), { fontSize: px(8) }]}>Yearly estimate</Text>
       {ecoCards.map((card) => (
         <Outlined
           key={card.label}
@@ -197,6 +194,11 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: fonts.body,
     color: colors.black,
+  },
+  estimate: {
+    fontFamily: fonts.body,
+    color: colors.mutedText,
+    textAlign: 'right',
   },
   centered: {
     textAlign: 'center',

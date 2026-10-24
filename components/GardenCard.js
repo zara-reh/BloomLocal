@@ -2,12 +2,14 @@ import { Image, StyleSheet, Text } from 'react-native';
 import { colors, fonts } from './theme';
 import { useStage } from './Screen';
 import Outlined from './Outlined';
-import { getCareStatus } from '../data/mockData';
+import { useCare } from '../state/useCare';
+
+const waterNames = { Low: 'Low', Moderate: 'Mod', High: 'Heavy' };
 
 // One plant in My Garden. left and top are in design units.
 export default function GardenCard({ plant, left, top }) {
   const { px, box } = useStage();
-  const status = getCareStatus(plant.id);
+  const status = useCare().statuses[plant.id];
 
   return (
     <Outlined
@@ -24,7 +26,7 @@ export default function GardenCard({ plant, left, top }) {
             <Text style={[styles.badge, { fontSize: px(7) }]}>{plant.sunLabel}</Text>
           </Outlined>
           <Outlined frame={[68, 105, 48, 14]} radius={5.4} border={1.35} shadow={0.7} fill={colors.blue}>
-            <Text style={[styles.badge, { fontSize: px(7) }]}>{`${plant.water === 'High' ? 'Heavy' : plant.water} Water`}</Text>
+            <Text style={[styles.badge, { fontSize: px(7) }]}>{`${waterNames[plant.water]} Water`}</Text>
           </Outlined>
 
           <Outlined

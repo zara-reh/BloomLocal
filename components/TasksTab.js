@@ -5,7 +5,7 @@ import Label from './Label';
 import Outlined from './Outlined';
 import Pop from './Pop';
 import { useAppState } from '../state/AppState';
-import { tasks } from '../data/mockData';
+import { dateFromIso, formatDay } from '../data/calendar';
 
 const FIRST_TOP = 397.1;
 const PITCH = 123.05;
@@ -16,7 +16,29 @@ const taskIcons = {
   shovel: { source: require('../assets/images/schedule/shovel.png'), size: [18.4, 17.3] },
 };
 
-function dueLabel(days) {
+const TIP_LINE_LENGTH = 30;
+
+// Splits a tip into lines that fit inside the tip box.
+function wrapTip(text) {
+  const lines = [];
+  let line = '';
+  text.split(' ').forEach((word) => {
+    if (line !== '' && `${line} ${word}`.length > TIP_LINE_LENGTH) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = line === '' ? word : `${line} ${word}`;
+    }
+  });
+  lines.push(line);
+  return lines;
+}
+
+function dueLabel(task) {
+  if (task.doneOn) {
+    return `Done ${formatDay(dateFromIso(task.doneOn))}`;
+  }
+  const days = task.dueInDays;
   if (days === 0) {
     return 'Do Today';
   }
@@ -28,18 +50,9 @@ export function tasksTabHeight(count) {
   return FIRST_TOP + Math.max(count, 1) * PITCH + 40;
 }
 
-export function visibleTasks(doneTaskIds, showDone) {
-  return tasks.filter((task) => doneTaskIds.includes(task.id) === showDone);
-}
-
-export default function TasksTab({ showDone, onToggleDone }) {
+export default function TasksTab({ shown, showDone, gardenEmpty, onToggleDone }) {
   const { box } = useStage();
-  const { doneTaskIds, setDoneTaskIds } = useAppState();
-  const shown = visibleTasks(doneTaskIds, showDone);
-
-  const toggleTask = (id) => {
-    setDoneTaskIds((ids) => (ids.includes(id) ? ids.filter((doneId) => doneId !== id) : [...ids, id]));
-  };
+  const { toggleTask } = useAppState();
 
   return (
     <>
@@ -50,16 +63,17 @@ export default function TasksTab({ showDone, onToggleDone }) {
 
       {shown.length === 0 && (
         <Label x={180} y={FIRST_TOP + 30} size={12} align="center" width={280} color={colors.subtitleGrey}>
-          {showDone ? 'No tasks are done yet.' : 'All tasks are done!'}
+          {showDone ? 'No tasks are done yet.' : gardenEmpty ? 'Add plants to your garden to get tasks.' : 'Nothing to do this week!'}
         </Label>
       )}
 
       {shown.map((task, index) => {
         const left = index === 0 ? 32.3 : 34.5;
         const top = FIRST_TOP + index * PITCH;
-        const done = doneTaskIds.includes(task.id);
+        const done = showDone;
         const icon = taskIcons[task.icon];
-        const tipTop = 65.35 - task.tip.length * 5.025;
+        const tipLines = wrapTip(task.tip);
+        const tipTop = 65.35 - tipLines.length * 5.025;
 
         // Everything in a task card is placed relative to the card, so the whole card pops when tapped.
         return (
@@ -68,7 +82,7 @@ export default function TasksTab({ showDone, onToggleDone }) {
             frame={[left, top, 295.4, 101.4]}
             scaleTo={0.97}
             label={`${task.title}, mark as ${done ? 'not done' : 'done'}`}
-            onPress={() => toggleTask(task.id)}
+            onPress={() => toggleTask(task)}
           >
             <Outlined frame={[0, 0, 295.4, 101.4]} radius={17} border={2} shadow={2} />
 
@@ -78,8 +92,8 @@ export default function TasksTab({ showDone, onToggleDone }) {
               style={box(27.7 - icon.size[0] / 2, 25 - icon.size[1] / 2, icon.size[0], icon.size[1])}
             />
             <Label
-              x={task.titleAt[0]}
-              y={task.titleAt[1]}
+              x={52.7}
+              y={14.5}
               size={16.8}
               width={200}
               color={done ? colors.mutedText : colors.black}
@@ -92,8 +106,8 @@ export default function TasksTab({ showDone, onToggleDone }) {
               {done && <CheckMark />}
             </Outlined>
 
-            <Outlined frame={[11.4, 55.4, 66.1, 18.8]} radius={9.4} border={1.5} shadow={0} fill={task.dueInDays === 0 ? '#E9D2D3' : '#E6E7D2'} />
-            <Label x={44.4} y={59.3} size={7.8} align="center" width={66}>{dueLabel(task.dueInDays)}</Label>
+            <Outlined frame={[11.4, 55.4, 66.1, 18.8]} radius={9.4} border={1.5} shadow={0} fill={!done && task.dueInDays === 0 ? '#E9D2D3' : '#E6E7D2'} />
+            <Label x={44.4} y={59.3} size={7.8} align="center" width={66}>{dueLabel(task)}</Label>
 
             <Outlined
               frame={[101.6, 45.2, 172.1, 39]}
@@ -103,13 +117,11 @@ export default function TasksTab({ showDone, onToggleDone }) {
               fill={scheduleColors.tipBox}
               borderColor={scheduleColors.tipBorder}
             />
-            {task.tipIcon && (
-              <Image source={require('../assets/images/schedule/bulb.png')} style={box(112.4, 56.1, 16.6, 23.2)} />
-            )}
-            {task.tip.map((line, lineIndex) => (
+            <Image source={require('../assets/images/schedule/bulb.png')} style={box(112.4, 56.1, 16.6, 23.2)} />
+            {tipLines.map((line, lineIndex) => (
               <Label
                 key={line}
-                x={task.tipCenter}
+                x={194.9}
                 y={tipTop + lineIndex * 10.05}
                 size={8}
                 align="center"

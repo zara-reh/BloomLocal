@@ -197,60 +197,6 @@ export const plants = [
   },
 ];
 
-export const ecoStats = {
-  oxygen: '14 lbs',
-  carbon: '6 lbs',
-  pollinatorScore: '70 pts',
-};
-
-// What each plant needs next. Plants not listed here were watered recently.
-const careStatuses = {
-  watermelon: { type: 'water', text: 'Water now!', urgent: true },
-  peony: { type: 'prune', text: 'Prune soon', urgent: true },
-};
-
-export function getCareStatus(plantId) {
-  return careStatuses[plantId] || { type: 'water', text: 'Watered 2 days ago.', urgent: false };
-}
-
-// The Schedule screen's tasks are pretend data. Dates come from today's real date.
-
-// dueInDays counts from today. titleAt is where the title starts inside the card,
-// tipCenter is where the tip text is centered.
-export const tasks = [
-  {
-    id: 'water-watermelon',
-    title: 'Water Watermelon',
-    icon: 'drop',
-    iconColor: '#C1E5FF',
-    dueInDays: 0,
-    tip: ['Water at the base early in the', 'morning so the leaves stay dry.'],
-    tipCenter: 200.7,
-    titleAt: [52.8, 15],
-  },
-  {
-    id: 'prune-peony',
-    title: 'Prune Peony',
-    icon: 'scissors',
-    iconColor: '#CBE8C1',
-    dueInDays: 0,
-    tip: ['Tip: cut all the stems down to', 'about 2 to 3 inches above the', 'ground!'],
-    tipCenter: 194.9,
-    titleAt: [52.6, 13.9],
-    tipIcon: true,
-  },
-  {
-    id: 'mulch-beds',
-    title: 'Add Mulch to Beds',
-    icon: 'shovel',
-    iconColor: '#E9D5C0',
-    dueInDays: 3,
-    tip: ['Mulch acts as a protective barrier that', 'conserves moisture and improves long', 'term soil health!'],
-    tipCenter: 191.4,
-    titleAt: [51.4, 15],
-  },
-];
-
 // When each plant buds and then blooms every year, as [[startMonth, startDay], [endMonth, endDay]].
 // name replaces the plant's usual name on the Bloom Tracker.
 export const bloomSeasons = {
